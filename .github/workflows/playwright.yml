@@ -12,63 +12,50 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-  mysql:
-    image: mysql:8
-    env:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: qa_test
-      MYSQL_USER: qa_user
-      MYSQL_PASSWORD: qa_pass
-    ports:
-      - 3306:3306
-    options: >-
-      --health-cmd="mysqladmin ping -h localhost -uroot -proot"
-      --health-interval=10s
-      --health-timeout=5s
-      --health-retries=5
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: qa_test
+          MYSQL_USER: qa_user
+          MYSQL_PASSWORD: qa_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    # ---------------------------
-    # Setup Python
-    # ---------------------------
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      # ---------------------------
+      # Setup Python
+      # ---------------------------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    - name: Install Python dependencies
-      run: |
-        pip install -r requirements.txt
+      - name: Install Python dependencies
+        run: |
+          pip install -r requirements.txt
 
-    - name: Wait for MySQL
-      run: |
-        sleep 20
+      - name: Wait for MySQL
+        run: |
+          sleep 20
 
-    - name: Run API and SQL tests
-      run: pytest
+      - name: Run API and SQL tests
+        run: pytest
 
-    # ---------------------------
-    # Setup Node
-    # ---------------------------
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
+      # ---------------------------
+      # Setup Node
+      # ---------------------------
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
 
-    - name: Install Node dependencies
-      run: npm ci
-
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-
-    - name: Run Playwright tests
-      run: npx playwright test
-
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-report
-        path: playwright-report/
-        retention-days: 30
+      - name: Install Node dependencies
+        run: npm ci
