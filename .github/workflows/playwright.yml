@@ -11,11 +11,25 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: qa_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
     - uses: actions/checkout@v4
 
     # ---------------------------
-    # Setup Python for API + SQL
+    # Setup Python
     # ---------------------------
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -26,11 +40,15 @@ jobs:
       run: |
         pip install -r requirements.txt
 
+    - name: Wait for MySQL
+      run: |
+        sleep 20
+
     - name: Run API and SQL tests
       run: pytest
 
     # ---------------------------
-    # Setup Node for Playwright
+    # Setup Node
     # ---------------------------
     - name: Setup Node.js
       uses: actions/setup-node@v4
@@ -46,9 +64,6 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
 
-    # ---------------------------
-    # Upload Playwright Report
-    # ---------------------------
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
