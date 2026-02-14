@@ -2,10 +2,10 @@ import pymysql
 
 def test_insert_and_read_order():
     connection = pymysql.connect(
-        host="localhost",
-        user="root",
-        password="SuperGal@345!",
-        database="qa_test"
+    host="localhost",
+    user="qa_user",
+    password="qa_pass",
+    database="qa_test"
     )
 
     cursor = connection.cursor()
